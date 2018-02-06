@@ -26,13 +26,13 @@ declare const cytoscape: any;
   type IVAlign = "top" | "center" | "bottom";
 
   interface ICytoscapeNodeHtmlParams {
-    query ?: string;
-    halign ?: IHAlign;
-    valign ?: IVAlign;
-    halignBox ?: IHAlign;
-    valignBox ?: IVAlign;
-    cssClass ?: string;
-    tpl ?: (d: any) => string;
+    query?: string;
+    halign?: IHAlign;
+    valign?: IVAlign;
+    halignBox?: IHAlign;
+    valignBox?: IVAlign;
+    cssClass?: string;
+    tpl?: (d: any) => string;
   }
 
   interface ICyEventObject {
@@ -68,8 +68,8 @@ declare const cytoscape: any;
     private _node: HTMLElement;
     private _align: [number, number, number, number];
 
-    constructor({node, baseClassName, position = null, data = null}: ILabelElement,
-                params: ICytoscapeNodeHtmlParams) {
+    constructor({ node, baseClassName, position = null, data = null }: ILabelElement,
+      params: ICytoscapeNodeHtmlParams) {
 
       this.updateParams(params);
       this._node = node;
@@ -87,11 +87,11 @@ declare const cytoscape: any;
 
     updateParams({
                    tpl = () => "",
-                   cssClass = null,
-                   halign = "center",
-                   valign = "center",
-                   halignBox = "center",
-                   valignBox = "center"
+      cssClass = null,
+      halign = "center",
+      valign = "center",
+      halignBox = "center",
+      valignBox = "center"
                  }: ICytoscapeNodeHtmlParams) {
 
       const _align = {
@@ -194,10 +194,10 @@ declare const cytoscape: any;
     }
 
     removeElemById(id: string) {
-        if (this._elements[id]) {
-            this._node.removeChild(this._elements[id].getNode());
-            delete this._elements[id];
-        }
+      if (this._elements[id]) {
+        this._node.removeChild(this._elements[id].getNode());
+        delete this._elements[id];
+      }
     }
 
     updateElemPosition(id: string, position?: ICytoscapeNodeHtmlPosition) {
@@ -207,7 +207,14 @@ declare const cytoscape: any;
       }
     }
 
-    updatePanZoom({pan, zoom}: { pan: { x: number, y: number }, zoom: number }) {
+    highlightElement(id: string) {
+      let ele = this._elements[id];
+      if (ele) {
+        ele.cssClass += "highlighted";
+      }
+    }
+
+    updatePanZoom({ pan, zoom }: { pan: { x: number, y: number }, zoom: number }) {
       const val = `translate(${pan.x}px,${pan.y}px) scale(${zoom})`;
       const stl = <any>this._node.style;
       const origin = 'top left';
@@ -224,7 +231,7 @@ declare const cytoscape: any;
       let stylesWrap = 'position:absolute;z-index:10;width:500px;pointer-events:none;margin:0;padding:0;border:0;outline:0';
       let stylesElem = 'position:absolute';
       document.querySelector('head').innerHTML +=
-          `<style>.${this._cssWrap}{${stylesWrap}} .${this._cssElem}{${stylesElem}}</style>`;
+        `<style>.${this._cssWrap}{${stylesWrap}} .${this._cssElem}{${stylesElem}}</style>`;
     }
   }
 
@@ -239,10 +246,11 @@ declare const cytoscape: any;
     _cy.on('add', addCyHandler);
     _cy.on('layoutstop', layoutstopHandler);
     _cy.on('remove', removeCyHandler);
+    _cy.on('tapend', tapendCyHandler);
+    _cy.on('tapstart', tapholdCyHandler);
     _cy.on('data', updateDataCyHandler);
     _cy.on('pan zoom', wrapCyHandler);
     _cy.on('drag', moveCyHandler);
-
     return _cy;
 
     function createLabelContainer(): LabelContainer {
@@ -259,7 +267,7 @@ declare const cytoscape: any;
       return new LabelContainer(_titlesContainer);
     }
 
-    function createNodesCyHandler({cy}: ICyEventObject) {
+    function createNodesCyHandler({ cy }: ICyEventObject) {
       _params.forEach(x => {
         cy.elements(x.query).forEach((d: any) => {
           if (d.isNode()) {
@@ -283,7 +291,7 @@ declare const cytoscape: any;
       }
     }
 
-    function layoutstopHandler({cy}: ICyEventObject) {
+    function layoutstopHandler({ cy }: ICyEventObject) {
       _params.forEach(x => {
         cy.elements(x.query).forEach((d: any) => {
           if (d.isNode()) {
@@ -295,6 +303,14 @@ declare const cytoscape: any;
 
     function removeCyHandler(ev: ICyEventObject) {
       _lc.removeElemById(ev.target.id());
+    }
+
+    function tapendCyHandler(ev: ICyEventObject) {
+
+    }
+
+    function tapholdCyHandler(ev: ICyEventObject) {
+      _lc.highlightElement(ev.target.id());
     }
 
     function moveCyHandler(ev: ICyEventObject) {
@@ -316,7 +332,7 @@ declare const cytoscape: any;
       }, 0);
     }
 
-    function wrapCyHandler({cy}: ICyEventObject) {
+    function wrapCyHandler({ cy }: ICyEventObject) {
       _lc.updatePanZoom({
         pan: cy.pan(),
         zoom: cy.zoom()
