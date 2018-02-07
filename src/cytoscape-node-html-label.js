@@ -112,15 +112,6 @@
                 }, param);
             }
         };
-        LabelContainer.prototype.highlightElement = function (id, active) {
-            if (active === void 0) { active = false; }
-            var ele = this._elements[id];
-            if (!ele)
-                return;
-            var classList = ele.getNode().classList;
-            var classSelector = "highlighted-node-label";
-            active ? classList.add(classSelector) : classList.remove(classSelector);
-        };
         LabelContainer.prototype.removeElemById = function (id) {
             if (this._elements[id]) {
                 this._node.removeChild(this._elements[id].getNode());
@@ -131,6 +122,12 @@
             var ele = this._elements[id];
             if (ele) {
                 ele.updatePosition(position);
+            }
+        };
+        LabelContainer.prototype.highlightElement = function (id) {
+            var ele = this._elements[id];
+            if (ele) {
+                ele.cssClass += "highlighted";
             }
         };
         LabelContainer.prototype.updatePanZoom = function (_a) {
@@ -217,13 +214,10 @@
             _lc.removeElemById(ev.target.id());
         }
         function tapendCyHandler(ev) {
-            if (ev.target.isNode && ev.target.isNode()) {
-                _lc.highlightElement(ev.target.id(), false);
-            }
         }
         function tapholdCyHandler(ev) {
-            if (ev.target.isNode && ev.target.isNode()) {
-                _lc.highlightElement(ev.target.id(), true);
+            if (ev.target.isNode()) {
+                _lc.highlightElement(ev.target.id());
             }
         }
         function moveCyHandler(ev) {
@@ -284,3 +278,4 @@
         register(cytoscape);
     }
 }());
+//# sourceMappingURL=cytoscape-node-html-label.js.map

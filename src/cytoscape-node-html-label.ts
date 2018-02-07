@@ -193,6 +193,16 @@ declare const cytoscape: any;
       }
     }
 
+    highlightElement(id: string, active: boolean = false) {
+      let ele = this._elements[id];
+      if (!ele) return;
+
+      let classList = ele.getNode().classList;
+      let classSelector = "highlighted-node-label";
+
+      active ? classList.add(classSelector) : classList.remove(classSelector);
+    }
+
     removeElemById(id: string) {
       if (this._elements[id]) {
         this._node.removeChild(this._elements[id].getNode());
@@ -204,13 +214,6 @@ declare const cytoscape: any;
       let ele = this._elements[id];
       if (ele) {
         ele.updatePosition(position);
-      }
-    }
-
-    highlightElement(id: string) {
-      let ele = this._elements[id];
-      if (ele) {
-        ele.cssClass += "highlighted";
       }
     }
 
@@ -306,11 +309,15 @@ declare const cytoscape: any;
     }
 
     function tapendCyHandler(ev: ICyEventObject) {
-
+      if (ev.target.isNode && ev.target.isNode()) {
+        _lc.highlightElement(ev.target.id(), false);
+      }
     }
 
     function tapholdCyHandler(ev: ICyEventObject) {
-      _lc.highlightElement(ev.target.id());
+      if (ev.target.isNode && ev.target.isNode()) {
+        _lc.highlightElement(ev.target.id(), true);
+      }
     }
 
     function moveCyHandler(ev: ICyEventObject) {
